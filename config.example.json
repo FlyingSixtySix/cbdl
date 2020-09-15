@@ -1,0 +1,19 @@
+{
+  "input": {
+    "path": "input",
+    "usernameList": "usernames.txt"
+  },
+  "output": {
+    "path": "output"
+  },
+  "retry": {
+    "fetch": {
+      "count": 3,
+      "delay": 1000
+    },
+    "puppeteer": {
+      "count": 3,
+      "delay": 1000
+    }
+  }
+}
