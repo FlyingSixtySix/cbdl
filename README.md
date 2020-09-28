@@ -29,6 +29,8 @@ regardless of platform.
 The script will create the following folders in the configured `output.path`
 (e.g. `output`) if they not exist already:
 
+- `art`
 - `flac`
-- `htmls`
+- `flac/free`
+- `jsons`
 - `rips`

@@ -4,8 +4,15 @@
     "usernameList": "usernames.txt"
   },
   "output": {
-    "path": "output"
+    "path": "output",
+    "artwork": "art",
+    "flacs": "flacs",
+    "metadata": "jsons",
+    "rips": "rips"
   },
+  "email": "me@example.com",
+  "postal": "69420",
+  "headless": true,
   "retry": {
     "fetch": {
       "count": 3,

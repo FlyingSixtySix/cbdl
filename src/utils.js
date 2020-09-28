@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path');
+const { join } = require('path');
 const fetch = require('node-fetch');
 
 function initConfig() {
@@ -14,13 +14,19 @@ function initConfig() {
     }
 }
 
-// If directory creation fails for any reason than it already existing, throw. Cannot recover.
-function mkdirFailed(err, type) {
-    if (err.code !== 'EEXIST') {
-        console.error('Could not create ' + type + ' directory. Details:');
-        console.trace(err);
-        process.exit(1);
-    }
+/**
+ * Creates a directory recursively and exits if an error occurs that's not EEXIST.
+ * @param path - The directory path.
+ * @returns {Promise<void>}
+ */
+async function mkdir(path) {
+    await fs.promises.mkdir(path, { recursive: true }).catch(err => {
+        if (err.code !== 'EEXIST') {
+            console.error(`Could not create ${path}. Details:`);
+            console.trace(err);
+            process.exit(1);
+        }
+    });
 }
 
 async function initDirectories(input, output) {
@@ -29,10 +35,10 @@ async function initDirectories(input, output) {
         mkdirFailed(err, 'input');
         newInputDir = false;
     });
-    await fs.promises.mkdir(output.path).catch(err => mkdirFailed(err, 'output'));
-    await fs.promises.mkdir(path.join(output.path, 'flac')).catch(err => mkdirFailed(err, 'output FLAC'));
-    await fs.promises.mkdir(path.join(output.path, 'htmls')).catch(err => mkdirFailed(err, 'output HTMLs'));
-    await fs.promises.mkdir(path.join(output.path, 'rips')).catch(err => mkdirFailed(err, 'output rips'));
+    await mkdir(join(output.path, output.artwork));
+    await mkdir(join(output.path, output.flacs, 'free'));
+    await mkdir(join(output.path, output.metadata));
+    await mkdir(join(output.path, output.rips));
     if (newInputDir) {
         console.info('Input and output directories have been created.');
         console.info('Please provide input according to README.md before continuing.');
@@ -40,8 +46,15 @@ async function initDirectories(input, output) {
     }
 }
 
+async function initArtistDirectories(output, artist) {
+    await mkdir(join(output.path, output.artwork, artist));
+    await mkdir(join(output.path, output.flacs, 'free', artist));
+    await mkdir(join(output.path, output.metadata, artist));
+    await mkdir(join(output.path, output.rips, artist));
+}
+
 async function processUsernames(input) {
-    const usernameListRaw = await fs.promises.readFile(path.join(input.path, input.usernameList), 'utf8').catch(err => {
+    const usernameListRaw = await fs.promises.readFile(join(input.path, input.usernameList), 'utf8').catch(err => {
         if (err.code === 'ENOENT') {
             console.error('Could not find username list at the configured path and filename.');
             process.exit(1);
@@ -112,4 +125,4 @@ function timeEnd(label) {
     return time;
 }
 
-module.exports = { initConfig, initDirectories, processUsernames, sortFeedItems, retry, downloadToFile, time, timeEnd };
+module.exports = { initConfig, mkdirFailed, initDirectories, initArtistDirectories, processUsernames, sortFeedItems, retry, downloadToFile, time, timeEnd };
