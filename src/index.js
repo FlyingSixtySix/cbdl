@@ -24,18 +24,16 @@ async function main() {
             }
             const artist = artistExec[1];
             // Surprisingly, we don't have the URL-friendly album or track names either. One of these will be null!
-            const albumExec = /album\/(.+)[?#]{0,}/.exec(item.url);
-            if (albumExec == null) {
-                console.error(`Could not determine album from URL "${item.url}" - is it an album? Skipping item.`);
+            const albumExec = /album\/(.+)[?#]*/.exec(item.url);
+            const trackExec = /track\/(.+)[?#]*/.exec(item.url);
+            if (albumExec == null && trackExec == null) {
+                console.error(`Could not determine album/track from URL "${item.url}". Skipping item.`);
                 continue;
             }
-            const album = albumExec[1];
-            const trackExec = /track\/(.+)[?#]{0,}/.exec(item.url);
-            if (trackExec == null) {
-                console.error(`Could not determine track from URL "${item.url}" - is it a track? Skipping item.`);
-                continue;
-            }
-            const track = trackExec[1];
+            let album;
+            let track;
+            if (albumExec != null) album = albumExec[1];
+            if (trackExec != null) track = trackExec[1];
             // Create artist sub-folders.
             await utils.initArtistDirectories(config.output, artist);
             const data = await page.evaluate(() => TralbumData);
@@ -45,9 +43,9 @@ async function main() {
             }
             // Save the metadata.
             if (data.item_type === 'album') {
-                await fs.writeFile(path.join(config.output.path, config.output.metadata, artist, 'metadata.json'), JSON.stringify(data));
+                await fs.writeFile(path.join(config.output.path, config.output.metadata, artist, album + '.json'), JSON.stringify(data));
             } else if (data.item_type === 'track') {
-                await fs.writeFile(path.join())
+                await fs.writeFile(path.join(config.output.path, config.output.metadata, artist, track + '.json'), JSON.stringify(data));
             }
             await fs.writeFile(path.join(config.output.path, config.output.metadata, artist, 'metadata.json'), JSON.stringify(data));
             // Save the album art.
