@@ -30,7 +30,7 @@ async function main() {
                 continue;
             }
             const album = albumExec[1];
-            const trackExec = /track\/(.+)[?#]+?/.exec(item.url);
+            const trackExec = /track\/(.+)[?#]{0,}/.exec(item.url);
             if (trackExec == null) {
                 console.error(`Could not determine track from URL "${item.url}" - is it a track? Skipping item.`);
                 continue;
