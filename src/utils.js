@@ -30,20 +30,16 @@ async function mkdir(path) {
 }
 
 async function initDirectories(input, output) {
-    let newInputDir = true;
-    await fs.promises.mkdir(input.path).catch(err => {
-        mkdirFailed(err, 'input');
-        newInputDir = false;
-    });
+    await mkdir(input.path);
     await mkdir(join(output.path, output.artwork));
     await mkdir(join(output.path, output.flacs, 'free'));
     await mkdir(join(output.path, output.metadata));
     await mkdir(join(output.path, output.rips));
-    if (newInputDir) {
-        console.info('Input and output directories have been created.');
-        console.info('Please provide input according to README.md before continuing.');
-        process.exit(1);
-    }
+//     if (newInputDir) {
+//         console.info('Input and output directories have been created.');
+//         console.info('Please provide input according to README.md before continuing.');
+//         process.exit(1);
+//     }
 }
 
 async function initArtistDirectories(output, artist) {
@@ -125,4 +121,4 @@ function timeEnd(label) {
     return time;
 }
 
-module.exports = { initConfig, mkdirFailed, initDirectories, initArtistDirectories, processUsernames, sortFeedItems, retry, downloadToFile, time, timeEnd };
+module.exports = { initConfig, initDirectories, initArtistDirectories, processUsernames, sortFeedItems, retry, downloadToFile, time, timeEnd };
