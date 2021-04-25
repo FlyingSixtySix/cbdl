@@ -17,13 +17,32 @@ async function main() {
         for (const item of feed.items) {
             await page.goto(item.url);
             // We want the URL-friendly artist name, but TralbumData only gives us the friendly display name.
-            const artist = /\/\/(.+).bandcamp/.exec(item.url)[1];
+            let artistExec = /\/\/(.+).bandcamp/.exec(item.url) || /\/\/bandcamp\.com\/(.+)/.exec(item.url);
+            if (artistExec == null) {
+                console.error(`Could not determine artist from URL "${item.url}". Skipping item.`);
+                continue;
+            }
+            const artist = artistExec[1];
             // Surprisingly, we don't have the URL-friendly album or track names either. One of these will be null!
-            const album = /album\/(.+)[?#]+?/.exec(item.url)[1];
-            const track = /track\/(.+)[?#]+?/.exec(item.url)[1];
+            const albumExec = /album\/(.+)[?#]+?/.exec(item.url);
+            if (albumExec == null) {
+                console.error(`Could not determine album from URL "${item.url}" - is it an album? Skipping item.`);
+                continue;
+            }
+            const album = albumExec[1];
+            const trackExec = /track\/(.+)[?#]+?/.exec(item.url);
+            if (trackExec == null) {
+                console.error(`Could not determine track from URL "${item.url}" - is it a track? Skipping item.`);
+                continue;
+            }
+            const track = trackExec[1];
             // Create artist sub-folders.
             await utils.initArtistDirectories(config.output, artist);
             const data = await page.evaluate(() => TralbumData);
+            if (data == null) {
+                console.error(`Could not get album data for ${artist} - do they still exist? Skipping item.`);
+                continue;
+            }
             // Save the metadata.
             if (data.item_type === 'album') {
                 await fs.writeFile(path.join(config.output.path, config.output.metadata, artist, 'metadata.json'), JSON.stringify(data));
