@@ -24,7 +24,7 @@ async function main() {
             }
             const artist = artistExec[1];
             // Surprisingly, we don't have the URL-friendly album or track names either. One of these will be null!
-            const albumExec = /album\/(.+)[?#]+?/.exec(item.url);
+            const albumExec = /album\/(.+)[?#]{0,}/.exec(item.url);
             if (albumExec == null) {
                 console.error(`Could not determine album from URL "${item.url}" - is it an album? Skipping item.`);
                 continue;
