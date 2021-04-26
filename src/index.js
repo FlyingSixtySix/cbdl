@@ -15,7 +15,12 @@ async function main() {
     for (const username of await utils.processUsernames(config.input)) {
         const feed = await getFeed(username);
         for (const item of feed.items) {
-            await page.goto(item.url);
+            try {
+                await page.goto(item.url);
+            } catch (err) {
+                console.error(`WARNING: Could not check "${item.url}". Skipping item.`);
+                continue;
+            }
             // We want the URL-friendly artist name, but TralbumData only gives us the friendly display name.
             let artistExec = /\/\/(.+).bandcamp/.exec(item.url) || /\/\/bandcamp\.com\/(.+)/.exec(item.url);
             if (artistExec == null) {
