@@ -98,7 +98,8 @@ async function main() {
                         });
                     });
                 });
-                await utils.downloadToFile(flacURL, path.join(config.output.path, config.output.flacs, 'free', artist, item.title + '.zip'));
+                const extension = data.item_type === 'album' ? '.zip' : '.flac';
+                await utils.downloadToFile(flacURL, path.join(config.output.path, config.output.flacs, 'free', artist, item.title + extension));
                 console.info('Downloaded');
                 continue;
             } else if (data.current.minimum_price > 0) {
