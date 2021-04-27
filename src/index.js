@@ -82,7 +82,7 @@ async function main() {
             for (let i = 0; i < allArtURLs.length; i++) {
                 console.info(`[${i+1}/${allArtURLs.length}] ${allArtURLs[i]}`);
                 const fileName = path.basename(url.parse(allArtURLs[i]).pathname);
-                await utils.downloadToFile(allArtURLs[i], path.join(config.output.path, config.output.artwork, artist, fileName));
+                await utils.downloadToFile(allArtURLs[i], path.join(config.output.path, config.output.artwork, artist), fileName);
             }
             let sentEmail = false;
             if (data.freeDownloadPage != null) {
@@ -104,7 +104,7 @@ async function main() {
                     });
                 });
                 const extension = data.item_type === 'album' ? '.zip' : '.flac';
-                await utils.downloadToFile(flacURL, path.join(config.output.path, config.output.flacs, 'free', artist, item.title + extension));
+                await utils.downloadToFile(flacURL, path.join(config.output.path, config.output.flacs, 'free', artist), item.title + extension);
                 console.info('Downloaded');
                 continue;
             } else if (data.current.minimum_price > 0) {
@@ -135,6 +135,8 @@ async function main() {
             }
         }
     }
+    console.info('Finished!');
+    process.exit(0);
 }
 
 const feedURLTemplate = 'https://rss-bridge-1.herokuapp.com/?action=display&bridge=Bandcamp&context=By+band&type=changes&limit=100&format=Json&band=';

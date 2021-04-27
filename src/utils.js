@@ -98,10 +98,16 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function downloadToFile(url, filePath) {
-    // console.debug('Downloading file from ' + url + ' to ' + filePath);
+async function downloadToFile(url, dirPath, fileName) {
     const res = await fetch(url);
-    const fileStream = fs.createWriteStream(filePath);
+    const contentDisposition = res.headers.get('content-disposition');
+    if (contentDisposition != null) {
+        const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (fileNameMatch != null) {
+            fileName = fileNameMatch[1];
+        }
+    }
+    const fileStream = fs.createWriteStream(join(dirPath, fileName));
     await new Promise((resolve, reject) => {
         res.body.pipe(fileStream);
         res.body.on('error', reject);
