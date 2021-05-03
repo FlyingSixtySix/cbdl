@@ -24,7 +24,8 @@ async function main() {
             try {
                 await page.goto(item.url);
             } catch (err) {
-                console.error(`WARNING: Could not check "${item.url}". Skipping item.`);
+                console.error(`WARNING: Could not check "${item.url}". Skipping item. Error is as follows:`);
+                console.error(err);
                 continue;
             }
             // We want the URL-friendly artist name, but TralbumData only gives us the friendly display name.
