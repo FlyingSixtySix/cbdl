@@ -10,7 +10,13 @@ const config = utils.initConfig();
 
 async function main() {
     await utils.initDirectories(config.input, config.output);
-    const browser = await puppeteer.launch({ headless: config.headless });
+    const browser = await puppeteer.launch({
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox'
+        ],
+        headless: config.headless
+    });
     const page = await browser.newPage();
     for (const username of await utils.processUsernames(config.input)) {
         const feed = await getFeed(username);
